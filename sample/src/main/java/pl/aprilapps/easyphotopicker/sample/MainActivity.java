@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements EasyImage.EasyIma
                 if (isLegacyExternalStoragePermissionRequired()) {
                     requestLegacyWriteExternalStoragePermission();
                 } else {
-                    easyImage.openCameraForImage(MainActivity.this);
+                    easyImage.openFrontCameraForImage(MainActivity.this);
                 }
             }
         });

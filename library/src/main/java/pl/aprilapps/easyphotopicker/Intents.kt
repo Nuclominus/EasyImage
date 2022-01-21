@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Parcelable
 import android.provider.MediaStore
+import android.hardware.camera2.CameraCharacteristics
 import java.io.IOException
 import java.util.*
 
@@ -42,8 +43,12 @@ internal object Intents {
         return intent
     }
 
-    internal fun createCameraForImageIntent(context: Context, fileUri: Uri): Intent {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+    internal fun createCameraForImageIntent(
+        context: Context,
+        fileUri: Uri,
+        cameraType: CameraType
+    ): Intent {
+        val intent = buildCameraIntent(cameraType)
         try {
             intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri)
             //We have to explicitly grant the write permission since Intent.setFlag works only on API Level >=20
@@ -103,4 +108,27 @@ internal object Intents {
             dataIntent.data == null
         }
     }
+
+    internal fun buildCameraIntent(cameraType: CameraType) =
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            .apply {
+                if (cameraType == CameraType.FRONTAL) {
+                    when {
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 && Build.VERSION.SDK_INT < Build.VERSION_CODES.O -> {
+                            putExtra(
+                                "android.intent.extras.CAMERA_FACING",
+                                CameraCharacteristics.LENS_FACING_FRONT
+                            )
+                        }
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
+                            putExtra(
+                                "android.intent.extras.CAMERA_FACING",
+                                CameraCharacteristics.LENS_FACING_FRONT
+                            )
+                            putExtra("android.intent.extra.USE_FRONT_CAMERA", true)
+                        }
+                        else -> putExtra("android.intent.extras.CAMERA_FACING", 1)
+                    }
+                }
+            }
 }

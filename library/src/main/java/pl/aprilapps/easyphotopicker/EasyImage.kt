@@ -99,12 +99,12 @@ class EasyImage private constructor(
         }
     }
 
-    private fun startCameraForImage(caller: Any) {
+    private fun startCameraForImage(caller: Any, cameraType: CameraType = CameraType.DEFAULT) {
         cleanup()
         getCallerActivity(caller)?.let { activityCaller ->
             lastCameraFile = Files.createCameraPictureFile(context)
             save()
-            val takePictureIntent = Intents.createCameraForImageIntent(activityCaller.context, lastCameraFile!!.uri)
+            val takePictureIntent = Intents.createCameraForImageIntent(activityCaller.context, lastCameraFile!!.uri, cameraType)
             val capableComponent = takePictureIntent.resolveActivity(context.packageManager)
                     ?.also {
                         activityCaller.startActivityForResult(takePictureIntent, RequestCodes.TAKE_PICTURE)
@@ -146,6 +146,10 @@ class EasyImage private constructor(
     fun openCameraForImage(activity: Activity) = startCameraForImage(activity)
     fun openCameraForImage(fragment: Fragment) = startCameraForImage(fragment)
     fun openCameraForImage(fragment: android.app.Fragment) = startCameraForImage(fragment)
+    fun openFrontCameraForImage(activity: Activity) = startCameraForImage(activity, CameraType.FRONTAL)
+    fun openFrontCameraForImage(fragment: Fragment) = startCameraForImage(fragment, CameraType.FRONTAL)
+    fun openFrontCameraForImage(fragment: android.app.Fragment) = startCameraForImage(fragment, CameraType.FRONTAL)
+    fun openFrontCameraForVideo(activity: Activity) = startCameraForVideo(activity)
     fun openCameraForVideo(activity: Activity) = startCameraForVideo(activity)
     fun openCameraForVideo(fragment: Fragment) = startCameraForVideo(fragment)
     fun openCameraForVideo(fragment: android.app.Fragment) = startCameraForVideo(fragment)
